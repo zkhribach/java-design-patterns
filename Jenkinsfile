@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     tools {
-        maven 'Maven 3.5.2'   // nom configuré dans Jenkins > Global Tool Configuration
-        jdk   'jdk11'
+        maven 'Maven 3'
+        jdk   'jdk17'
     }
 
     stages {
@@ -23,7 +23,7 @@ pipeline {
         stage('Tests') {
             parallel {
 
-                stage('Tests Unitaires') {
+                stage('Unit Tests') {
                     steps {
                         sh './mvnw test -pl singleton'
                     }
@@ -34,22 +34,25 @@ pipeline {
                     }
                 }
 
-                stage('Couverture de Code') {
+                stage('Code Coverage - JaCoCo') {
                     steps {
-                        sh './mvnw cobertura:cobertura -pl singleton'
+                        sh './mvnw jacoco:report -pl singleton'
                     }
                     post {
                         always {
                             publishHTML([
-                                reportDir:   'singleton/target/site/cobertura',
-                                reportFiles: 'index.html',
-                                reportName:  'Cobertura Coverage'
+                                reportDir:             'singleton/target/site/jacoco',
+                                reportFiles:           'index.html',
+                                reportName:            'JaCoCo Coverage Report',
+                                keepAll:               true,
+                                alwaysLinkToLastBuild: true,
+                                allowMissing:          false
                             ])
                         }
                     }
                 }
 
-                stage('Analyse Qualite') {
+                stage('Code Quality') {
                     steps {
                         sh './mvnw checkstyle:checkstyle pmd:pmd -pl singleton'
                     }
@@ -65,9 +68,12 @@ pipeline {
             post {
                 always {
                     publishHTML([
-                        reportDir:   'singleton/target/site',
-                        reportFiles: 'index.html',
-                        reportName:  'Maven Site + Javadoc'
+                        reportDir:             'singleton/target/site',
+                        reportFiles:           'index.html',
+                        reportName:            'Maven Site + Javadoc',
+                        keepAll:               true,
+                        alwaysLinkToLastBuild: true,
+                        allowMissing:          false
                     ])
                 }
             }
@@ -85,22 +91,16 @@ pipeline {
             }
         }
 
-        stage('Deploy Nexus') {
-            steps {
-                sh './mvnw deploy -pl singleton -DskipTests'
-            }
-        }
-
     }
 
     post {
         failure {
-            mail to:      'ziyad.khribach@esi.ac.ma',
+            mail to:      'ziyad@email.com',
                  subject: "ECHEC Pipeline: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                 body:    "Voir les logs ici : ${env.BUILD_URL}"
+                 body:    "Le build a echoue. Voir les logs ici : ${env.BUILD_URL}"
         }
         success {
-            echo '✅ Pipeline terminé avec succès!'
+            echo 'Pipeline termine avec succes!'
         }
     }
 }
