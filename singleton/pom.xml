@@ -33,6 +33,20 @@
     <version>1.26.0-SNAPSHOT</version>
   </parent>
   <artifactId>singleton</artifactId>
+
+
+  <developers>
+      <developer>
+          <name>zkhribach</name>
+          <email>ziyad.khribach@esi.ac.ma</email>
+          <roles>
+              <role>developer</role>
+              <role>devops</role>
+          </roles>
+      </developer>
+  </developers>
+
+
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -48,8 +62,35 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+
   <build>
     <plugins>
+
+        <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <version>0.8.11</version>
+            <executions>
+                <!-- Prépare l'agent avant les tests -->
+                <execution>
+                    <id>prepare-agent</id>
+                    <goals>
+                        <goal>prepare-agent</goal>
+                    </goals>
+                </execution>
+                <!-- Génère le rapport HTML après les tests -->
+                <execution>
+                    <id>report</id>
+                    <phase>test</phase>
+                    <goals>
+                        <goal>report</goal>
+                    </goals>
+                </execution>
+            </executions>
+        </plugin>
+
+
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
@@ -65,6 +106,60 @@
           </execution>
         </executions>
       </plugin>
+
+      <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <version>3.6.2</version>
+          <configuration>
+              <show>private</show>
+              <nohelp>true</nohelp>
+          </configuration>
+      </plugin>
+
+      <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-pmd-plugin</artifactId>
+          <version>3.28.0</version>
+      </plugin>
+
     </plugins>
   </build>
+  <reporting>
+      <plugins>
+
+          <plugin>
+              <groupId>org.jacoco</groupId>
+              <artifactId>jacoco-maven-plugin</artifactId>
+              <version>0.8.11</version>
+              <reportSets>
+                  <reportSet>
+                      <reports>
+                          <report>report</report>
+                      </reports>
+                  </reportSet>
+              </reportSets>
+          </plugin>
+
+
+
+
+
+
+
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <version>3.6.2</version>
+        </plugin>
+        <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-checkstyle-plugin</artifactId>
+            <version>3.3.0</version>
+            <configuration>
+                <configLocation>google_checks.xml</configLocation>
+            </configuration>
+        </plugin>
+      </plugins>
+    </reporting>
 </project>
