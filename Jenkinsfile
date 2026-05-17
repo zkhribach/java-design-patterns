@@ -95,9 +95,7 @@ pipeline {
 
     post {
         failure {
-            mail to:      'ziyad@email.com',
-                 subject: "ECHEC Pipeline: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                 body:    "Le build a echoue. Voir les logs ici : ${env.BUILD_URL}"
+            echo "ECHEC: ${env.JOB_NAME} #${env.BUILD_NUMBER} - Voir: ${env.BUILD_URL}"
         }
         success {
             echo 'Pipeline termine avec succes!'
